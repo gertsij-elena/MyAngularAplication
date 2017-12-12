@@ -1,97 +1,75 @@
-﻿using MyAngularAplication.Model;
-using MyAngularAplication.Repositories;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MyAngularAplication.Model;
+
 
 namespace MyAngularAplication.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/user")]
     public class UserController : Controller
     {
-        private readonly IUserRepository _userRepository;
-
-        public UserController(IUserRepository userRepository)
+        public ApplicationContext db;
+        public UserController(ApplicationContext context)
         {
-            _userRepository = userRepository;
-        }
-        // GET: api/values
-        [HttpGet]
-        public IActionResult Get()
-        {
-            return Ok(_userRepository.GetAll());
-        }
-
-        // GET api/values/5
-        [HttpGet]
-        [Route("{id:int}", Name = "GetSingleUser")]
-        public IActionResult GetSingleUser(int id)
-        {
-            User user = _userRepository.GetSingle(id);
-
-            if (user == null)
+            db = context;
+            if (!db.Users.Any())
             {
-                return NotFound();
+                db.Users.Add(new User { Name = "Alex", Birthdate = "15/10/1970", Position = "Developer",Phone="0670655566",Address="Vinnytsia",Image="foto_alex" });
+         
+                db.SaveChanges();
             }
-
-            return Ok(user);
+        }
+        [HttpGet]
+        public IEnumerable<User> Get()
+        {
+            return db.Users.ToList();
         }
 
-        // POST api/values
+        [HttpGet("{id}")]
+        public User Get(int id)
+        {
+            User user = db.Users.FirstOrDefault(u=>u.Id == id);
+            return user;
+        }
+
         [HttpPost]
-        public IActionResult Add([FromBody]User user)
+        public IActionResult Post([FromBody]User user)
         {
-            if (user == null)
+            if (ModelState.IsValid)
             {
-                return BadRequest();
+                db.Users.Add(user);
+                db.SaveChanges();
+                return Ok(user);
             }
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            User newUser = _userRepository.Add(user);
-
-            return CreatedAtRoute("GetSingleUser", new { id = newUser.Id }, newUser);
+            return BadRequest(ModelState);
         }
 
-        // PUT api/values/5
-        [HttpPut]
-        [Route("{id:int}")]
-        public IActionResult Update(int id, [FromBody]User user)
+        [HttpPut("{id}")]
+        public IActionResult Put(int id, [FromBody]User user)
         {
-            User checkedUser = _userRepository.GetSingle(id);
-            if (checkedUser == null)
+            if (ModelState.IsValid)
             {
-                return NotFound();
+                db.Update(user);
+                db.SaveChanges();
+                return Ok(user);
             }
-
-            if (id != user.Id)
-            {
-                return BadRequest("Id do not match");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest("ModelState is not valid");
-            }
-            User updateUser = _userRepository.Update(id, user);
-            return Ok(updateUser);
-
+            return BadRequest(ModelState);
         }
 
-        // DELETE api/values/5
-        [HttpDelete]
-        [Route("{id:int}")]
+        [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            User user = _userRepository.GetSingle(id);
-            if (user == null)
+            User user = db.Users.FirstOrDefault(x => x.Id == id);
+            if (user != null)
             {
-                return NotFound();
+                db.Users.Remove(user);
+                db.SaveChanges();
             }
-            _userRepository.Delete(id);
-            return NoContent();
-
+            return Ok(user);
         }
     }
 }
