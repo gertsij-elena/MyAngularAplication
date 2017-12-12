@@ -18,7 +18,7 @@ export class UserDataComponent implements OnInit{
     }
 
     public ngOnInit():void {
-        this._user = this._userService.GetUser();
+     this._user = this._userService.getAll();       
     }
 }
 

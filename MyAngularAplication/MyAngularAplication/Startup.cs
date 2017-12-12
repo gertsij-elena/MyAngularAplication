@@ -1,12 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
+using MyAngularAplication.Model;
+
 
 namespace MyAngularAplication
 {
@@ -14,6 +13,7 @@ namespace MyAngularAplication
     {
         public Startup(IConfiguration configuration)
         {
+           
             Configuration = configuration;
         }
 
@@ -22,6 +22,8 @@ namespace MyAngularAplication
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            string connectionString = "Server=(localdb)\\mssqllocaldb;Database=userdb;Trusted_Connection=True;";
+            services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connectionString));
             services.AddMvc();
         }
 
