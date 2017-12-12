@@ -13,12 +13,13 @@ namespace MyAngularAplication.Controllers
     public class UserController : Controller
     {
         public ApplicationContext db;
+
         public UserController(ApplicationContext context)
         {
             db = context;
             if (!db.Users.Any())
             {
-                db.Users.Add(new User { Name = "Alex", Birthdate = "15/10/1970", Position = "Developer",Phone="0670655566",Address="Vinnytsia",Image="foto_alex" });
+                db.Add(new User { Name = "Alex", Birthdate = "15/10/1970", Position = "Developer",Phone="0670655566",Address="Vinnytsia",Image="foto_alex" });
          
                 db.SaveChanges();
             }
